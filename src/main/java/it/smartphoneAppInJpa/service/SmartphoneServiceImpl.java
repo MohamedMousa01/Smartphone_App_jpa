@@ -2,22 +2,28 @@ package it.smartphoneAppInJpa.service;
 
 import it.smartphoneAppInJpa.dao.EntityManagerUtil;
 import it.smartphoneAppInJpa.dao.app.AppDAO;
+import it.smartphoneAppInJpa.dao.app.AppDAOImpl;
 import it.smartphoneAppInJpa.dao.smartphone.SmartphoneDAO;
 import it.smartphoneAppInJpa.model.App;
 import it.smartphoneAppInJpa.model.Smartphone;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 
 public class SmartphoneServiceImpl implements SmartphoneService {
 
 
     private SmartphoneDAO smartphoneDAO;
+    private AppDAO appDAO;
 
     @Override
     public void setSmartphoneDAO(SmartphoneDAO smartphoneDAO) {
         this.smartphoneDAO = smartphoneDAO;
     }
+
+    @Override
+    public void setAppDAO(AppDAO appDAO){ this.appDAO = appDAO;}
 
     @Override
     public List<Smartphone> listAll() throws Exception {
@@ -141,8 +147,69 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
 
 
+    public void aggiornaVersioneEDataApp(Long idSmartphone, Long idApp, String nuovaVersione) throws Exception {
+
+        EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+        try {
+            entityManager.getTransaction().begin();
+
+            smartphoneDAO.setEntityManager(entityManager);
+            appDAO.setEntityManager(entityManager);
+
+            Smartphone smartphone = smartphoneDAO.findById(idSmartphone);
+            App app = appDAO.findById(idApp);
+
+            if (smartphone == null || app == null) {
+                throw new Exception("Smartphone o App non trovati");
+            }
+
+            smartphone.setVersioneOS(nuovaVersione);
+            app.setDataUltimoAggiornamento(LocalDate.now());
+
+            smartphoneDAO.update(smartphone);
+            appDAO.update(app);
+
+            entityManager.getTransaction().commit();
+
+        } catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            EntityManagerUtil.closeEntityManager(entityManager);
+        }
+    }
 
 
+
+
+    @Override
+    public void disinstallaApp(Long idSmartphone, Long idApp) throws Exception {
+
+        EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+        try {
+            entityManager.getTransaction().begin();
+
+            smartphoneDAO.setEntityManager(entityManager);
+            appDAO.setEntityManager(entityManager);
+
+            Smartphone smartphone = smartphoneDAO.findById(idSmartphone);
+            App app = appDAO.findById(idApp);
+
+            smartphoneDAO.disinstallaApp(idSmartphone, idApp);
+
+            entityManager.getTransaction().commit();
+
+        } catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            EntityManagerUtil.closeEntityManager(entityManager);
+        }
+    }
 
 
 }

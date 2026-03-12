@@ -11,7 +11,7 @@ public class SmartphoneDAOImpl implements SmartphoneDAO{
 
     @Override
     public List<Smartphone> findAll() throws Exception {
-        return entityManager.createQuery("from Brano", Smartphone.class).getResultList();
+        return entityManager.createQuery("from Smartphone", Smartphone.class).getResultList();
     }
 
     @Override
@@ -40,13 +40,34 @@ public class SmartphoneDAOImpl implements SmartphoneDAO{
         if (id == null)
             throw new Exception("Problema valore in input");
 
-        entityManager.createQuery("delete from Brano where id=?1").setParameter(1, id).executeUpdate();
+        entityManager.createQuery("delete from Smartphone where id=?1").setParameter(1, id).executeUpdate();
     }
 
     @Override
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
+
+
+    public void disinstallaApp(Long idSmartphone, Long idApp) throws Exception{
+
+        if (idSmartphone == null || idApp == null) {
+            throw new Exception("Input non valido");
+        }
+
+        int rows = entityManager.createNativeQuery(
+                        "delete from smartphone_app where smartphone_id = ?1 and app_id = ?2")
+                .setParameter(1, idSmartphone)
+                .setParameter(2, idApp)
+                .executeUpdate();
+
+        if (rows == 0) {
+            throw new Exception("Nessuna app disinstallata: associazione non trovata");
+        }
+    }
+
+
+
 
 
 

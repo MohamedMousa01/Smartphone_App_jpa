@@ -15,12 +15,16 @@ public interface SmartphoneService {
 
     public Smartphone caricaSingoloElemento(Long id) throws Exception;
 
-
     public void aggiorna(Smartphone smartphoneIntance) throws Exception;
 
     public void inserisciNuovo(Smartphone smartphoneInstance) throws Exception;
 
     public void rimuovi(Long idSmartphone) throws Exception;
 
+    public void aggiornaVersioneEDataApp(Long idSmartphone, Long idApp, String nuovaVersione) throws Exception;
+
+    public void setAppDAO(AppDAO appDAO);
+
+    public void disinstallaApp(Long idSmartphone, Long idApp) throws Exception;
 
 }
